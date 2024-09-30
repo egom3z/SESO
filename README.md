@@ -1,1 +1,3 @@
 # SESO
+
+Southwestern Ediddyonal Society.
