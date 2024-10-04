@@ -1,10 +1,22 @@
 import pygame
 import sys
+from enum import Enum
 
 # Initialize Pygame
 pygame.init()
 pygame.font.init()
 font = pygame.font.SysFont(None, 30)
+
+# direction class
+class direction(Enum):
+    STOP = 0
+    LEFT = 1
+    RIGHT = 2
+    UP = 3
+
+direction = Enum('direction', ['STOP', 'LEFT', 'RIGHT','UP'])
+current_direction = direction.STOP
+
 
 # Defining colors for conveniance
 white = (255, 255, 255)
@@ -18,12 +30,20 @@ screen = pygame.display.set_mode(window_size)
 clock = pygame.time.Clock()
 seconds_elapsed = 0
 last_time = pygame.time.get_ticks()
+box_rect = pygame.Rect(150, 100, 100, 50)
+pygame.draw.rect(screen, black, box_rect)
 
 # Set up the sprite sheets
 sprite_sheet = pygame.image.load('src/images/character_sheet2.png').convert_alpha()
-sprite_rect = pygame.Rect(16, 96, 16, 16)
-sprite1 = sprite_sheet.subsurface(sprite_rect)
-scaled_sprite1 = pygame.transform.scale(sprite1, (32, 32))
+sprite0_rect = pygame.Rect(16,96,16,16)
+spriteR_rect = pygame.Rect(32,96,16,16)
+spriteL_rect = pygame.Rect(0,96,16,16)
+sprite0 = sprite_sheet.subsurface(sprite0_rect)
+spriteR = sprite_sheet.subsurface(spriteR_rect)
+spriteL = sprite_sheet.subsurface(spriteL_rect)
+scaled_sprite0 = pygame.transform.scale(sprite0, (32,32))
+scaled_spriteR = pygame.transform.scale(spriteR, (32,32))
+scaled_spriteL = pygame.transform.scale(spriteL, (32,32))
 
 
 center_x = screen_width // 2
@@ -88,14 +108,21 @@ while running:
     if(X_VELOCITY < MIN_VELOCITY ):
             X_VELOCITY = -10
 
-    if keys[pygame.K_a]:
-        walking = keys[pygame.K_a]
-        X_VELOCITY -= 1
-    if keys[pygame.K_d]:
-        walking = keys[pygame.K_d]
-        X_VELOCITY += 1
+
     if keys[pygame.K_SPACE]:
-        jumping = True
+            jumping = True
+    elif keys[pygame.K_a]:
+        walking = keys[pygame.K_a]
+        current_direction = direction.LEFT
+        X_VELOCITY -= 1
+    elif keys[pygame.K_d]:
+        walking = keys[pygame.K_d]
+        current_direction = direction.RIGHT
+        X_VELOCITY += 1
+    elif not keys[pygame.K_d] and not keys[pygame.K_a]:
+         current_direction = direction.STOP
+         X_VELOCITY = 0
+    
     
     # Walking mechanics
     if walking:
@@ -124,7 +151,13 @@ while running:
          
 
     # Display sprite
-    screen.blit(scaled_sprite1, (player_pos.x - 16, player_pos.y - 16))
+    
+    if current_direction == direction.LEFT:
+         screen.blit(scaled_spriteL, (player_pos.x - 16, player_pos.y - 16))
+    elif current_direction == direction.RIGHT:
+         screen.blit(scaled_spriteR, (player_pos.x - 16, player_pos.y - 16))
+    else:
+         screen.blit(scaled_sprite0, (player_pos.x - 16, player_pos.y - 16))
 
     # Update the display
     pygame.display.flip()
