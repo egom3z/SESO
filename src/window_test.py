@@ -13,8 +13,9 @@ class direction(Enum):
     LEFT = 1
     RIGHT = 2
     UP = 3
+    JUMP = 4
 
-direction = Enum('direction', ['STOP', 'LEFT', 'RIGHT','UP'])
+direction = Enum('direction', ['STOP', 'LEFT', 'RIGHT','UP','JUMP'])
 current_direction = direction.STOP
 
 
@@ -44,15 +45,18 @@ box_border = 5
 
 # Set up the sprite sheets
 sprite_sheet = pygame.image.load('src/images/character_sheet2.png').convert_alpha()
-sprite0_rect = pygame.Rect(16,96,16,16)
-spriteR_rect = pygame.Rect(32,96,16,16)
-spriteL_rect = pygame.Rect(0,96,16,16)
+sprite0_rect = pygame.Rect(16,96,16,16) # Character standing facing right
+spriteR_rect = pygame.Rect(32,96,16,16) # Character walking to the right
+spriteL_rect = pygame.Rect(0,96,16,16)  # Character walking to the left
+spriteJ_rect = pygame.Rect(16,80,16,16) # Character jumping up facing right
 sprite0 = sprite_sheet.subsurface(sprite0_rect)
 spriteR = sprite_sheet.subsurface(spriteR_rect)
 spriteL = sprite_sheet.subsurface(spriteL_rect)
-scaled_sprite0 = pygame.transform.scale(sprite0, (32,32))
+spriteJ = sprite_sheet.subsurface(spriteJ_rect)
+scaled_sprite0 = pygame.transform.scale(sprite0, (32,32)) # Scales up 16x16 sprite
 scaled_spriteR = pygame.transform.scale(spriteR, (32,32))
 scaled_spriteL = pygame.transform.scale(spriteL, (32,32))
+scaled_spriteJ = pygame.transform.scale(spriteJ, (32,32))
 
 
 
@@ -144,6 +148,7 @@ while running:
     elif not keys[pygame.K_d] and not keys[pygame.K_a]:
          current_direction = direction.STOP
          X_VELOCITY = 0
+
     
     
     # Walking mechanics
@@ -155,6 +160,8 @@ while running:
     if jumping:
         player_pos.y -= Y_VELOCITY
         Y_VELOCITY -= Y_GRAVITY
+        if X_VELOCITY == 0:
+             current_direction = direction.JUMP
         if Y_VELOCITY < -JUMP_HEIGHT:
             jumping = False
             Y_VELOCITY = JUMP_HEIGHT     
@@ -164,6 +171,8 @@ while running:
          screen.blit(scaled_spriteL, (player_pos.x - 16, player_pos.y - 16))
     elif current_direction == direction.RIGHT:
          screen.blit(scaled_spriteR, (player_pos.x - 16, player_pos.y - 16))
+    elif current_direction == direction.JUMP:
+         screen.blit(scaled_spriteJ, (player_pos.x-16, player_pos.y -16))
     else:
          screen.blit(scaled_sprite0, (player_pos.x - 16, player_pos.y - 16))
 
