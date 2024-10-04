@@ -19,19 +19,28 @@ current_direction = direction.STOP
 
 
 # Defining colors for conveniance
-white = (255, 255, 255)
-black = (0, 0, 0)
+white = (255,255,255)
+blue = (0,0,255)
+black = (0,0,0)
+red = (255,0,0)
+green = (0,255,0)
 
 # Set up the game window
-screen_width = 1280 # Jeshua size (1600 inches)
+screen_width = 1280 # Victor-circumference(cm)
 screen_height = 720
 window_size = (screen_width, screen_height)
+center_x = screen_width // 2
+center_y = screen_height // 2
 screen = pygame.display.set_mode(window_size)
 clock = pygame.time.Clock()
 seconds_elapsed = 0
 last_time = pygame.time.get_ticks()
-box_rect = pygame.Rect(150, 100, 100, 50)
-pygame.draw.rect(screen, black, box_rect)
+
+# Box object definition
+box_rect = pygame.Rect(center_x+150, center_y-84, 100, 100)
+box_border = 5
+
+
 
 # Set up the sprite sheets
 sprite_sheet = pygame.image.load('src/images/character_sheet2.png').convert_alpha()
@@ -46,14 +55,10 @@ scaled_spriteR = pygame.transform.scale(spriteR, (32,32))
 scaled_spriteL = pygame.transform.scale(spriteL, (32,32))
 
 
-center_x = screen_width // 2
-center_y = screen_height // 2
-
-
 
 # Movement parameters
 Y_GRAVITY = 1
-JUMP_HEIGHT = 20
+JUMP_HEIGHT = 15
 Y_VELOCITY = JUMP_HEIGHT
 jumping = False
 walking = False
@@ -64,6 +69,7 @@ X_VELOCITY = 1
 
 # Vector2: 2D Vector (x, y) for character
 player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+dynamic_rect = pygame.Rect(player_pos.x - 16, player_pos.y - 16, 32, 32)
 
 
 
@@ -79,12 +85,26 @@ while running:
             running = False
     
     # Fill the screen with a color (RGB)
-    screen.fill((255, 255, 255)) # background
+    screen.fill(white) # background
+
+    # Box object implementation
+    pygame.draw.rect(screen, black, box_rect, box_border) 
     
+    # Old player dot
     # pygame.draw.circle(screen, black, player_pos, 5)
 
 
-
+        # Boundry Check
+    if player_pos.x - 5 < 0:
+         player_pos.x = 5
+         X_VELOCITY = 0
+    elif player_pos.x + 5 > screen_width:
+         player_pos.x = screen_width - 5
+         X_VELOCITY = 0
+    if player_pos.y - 5 < 0:
+         player_pos.y = 5
+    elif player_pos.y + 5 > screen_height:
+         player_pos.y = screen_height - 5
     if player_pos.x < 0:
         player_pos.x = 0
     elif player_pos.x > 1600:
@@ -103,12 +123,14 @@ while running:
     
     keys = pygame.key.get_pressed()
 
+    # Limits velocity to ensure control
     if(X_VELOCITY > MAX_VELOCITY):
-            X_VELOCITY = 10
+            X_VELOCITY = 5
     if(X_VELOCITY < MIN_VELOCITY ):
-            X_VELOCITY = -10
+            X_VELOCITY = -5
 
 
+    # Post-input functions
     if keys[pygame.K_SPACE]:
             jumping = True
     elif keys[pygame.K_a]:
@@ -135,23 +157,9 @@ while running:
         Y_VELOCITY -= Y_GRAVITY
         if Y_VELOCITY < -JUMP_HEIGHT:
             jumping = False
-            Y_VELOCITY = JUMP_HEIGHT
-    
-    # Boundry Check
-    if player_pos.x - 5 < 0:
-         player_pos.x = 5
-         X_VELOCITY = 0
-    elif player_pos.x + 5 > screen_width:
-         player_pos.x = screen_width - 5
-         X_VELOCITY = 0
-    if player_pos.y - 5 < 0:
-         player_pos.y = 5
-    elif player_pos.y + 5 > screen_height:
-         player_pos.y = screen_height - 5
-         
+            Y_VELOCITY = JUMP_HEIGHT     
 
-    # Display sprite
-    
+    # Display character sprite
     if current_direction == direction.LEFT:
          screen.blit(scaled_spriteL, (player_pos.x - 16, player_pos.y - 16))
     elif current_direction == direction.RIGHT:
@@ -159,8 +167,14 @@ while running:
     else:
          screen.blit(scaled_sprite0, (player_pos.x - 16, player_pos.y - 16))
 
+    # Collision management
+    dynamic_rect.topleft = (player_pos.x - 16, player_pos.y - 16)
+    if dynamic_rect.colliderect(box_rect):
+        pygame.draw.rect(screen, red, box_rect)
+
     # Update the display
     pygame.display.flip()
+    # pygame.display.update() # Alternate option to the same function (I think)
     
     clock.tick(60)  # limits FPS to 60
     
