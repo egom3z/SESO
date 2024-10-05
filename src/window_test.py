@@ -13,11 +13,11 @@ class direction(Enum):
     LEFT = 1
     RIGHT = 2
     UP = 3
-    JUMP = 4
+    DOWN = 4
 
 forward_facing = True # last direction faced
 
-direction = Enum('direction', ['STOP', 'LEFT', 'RIGHT','UP','JUMP'])
+direction = Enum('direction', ['STOP', 'LEFT', 'RIGHT','UP','DOWN'])
 current_direction = direction.STOP
 
 
@@ -46,7 +46,7 @@ box_border = 5
 
 
 # Set up the sprite sheets
-sprite_sheet = pygame.image.load('src/images/character_sheet2.png').convert_alpha()
+sprite_sheet = pygame.image.load('images/character_sheet2.png').convert_alpha()
 sprite0_rect = pygame.Rect(16,96,16,16) # Character standing facing right
 sprite1_rect = pygame.Rect(64,96,16,16)  # Character standing facing left
 spriteR_rect = pygame.Rect(32,96,16,16) # Character walking to the right
@@ -80,7 +80,7 @@ X_VELOCITY = 1
 
 
 # Vector2: 2D Vector (x, y) for character
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+player_pos = pygame.Vector2(center_x, center_y)
 dynamic_rect = pygame.Rect(player_pos.x - 16, player_pos.y - 16, 32, 32)
 
 
@@ -145,6 +145,10 @@ while running:
     # Post-input functions
     if keys[pygame.K_SPACE]:
             jumping = True
+            # if Y_VELOCITY > 0:
+            #     current_direction = direction.UP
+            # elif Y_VELOCITY < 0:
+            #     current_direction = direction.DOWN
     elif keys[pygame.K_a]:
         walking = keys[pygame.K_a]
         forward_facing = False
@@ -171,7 +175,7 @@ while running:
         player_pos.y -= Y_VELOCITY
         Y_VELOCITY -= Y_GRAVITY
         if X_VELOCITY == 0:
-             current_direction = direction.JUMP
+             current_direction = direction.UP
         if Y_VELOCITY < -JUMP_HEIGHT:
             jumping = False
             Y_VELOCITY = JUMP_HEIGHT     
@@ -181,11 +185,16 @@ while running:
          screen.blit(scaled_spriteL, (player_pos.x - 16, player_pos.y - 16))
     elif current_direction == direction.RIGHT:
          screen.blit(scaled_spriteR, (player_pos.x - 16, player_pos.y - 16))
-    elif current_direction == direction.JUMP:
+    elif current_direction == direction.UP:
         if forward_facing:
             screen.blit(scaled_spriteJ, (player_pos.x - 16, player_pos.y - 16))
         elif not forward_facing:
             screen.blit(scaled_spriteJL, (player_pos.x - 16, player_pos.y - 16))
+    elif current_direction == direction.DOWN:
+        if forward_facing:
+            screen.blit(scaled_sprite0, (player_pos.x - 16, player_pos.y - 16)) # TO BE REPLACED WITH DOWN RIGHT SPRITE
+        elif not forward_facing:
+            screen.blit(scaled_sprite1, (player_pos.x - 16, player_pos.y - 16)) # TO BE REPLACED WITH DOWN LEFT SPRITE
     else:
         if forward_facing:
             screen.blit(scaled_sprite0, (player_pos.x - 16, player_pos.y - 16))
@@ -196,6 +205,18 @@ while running:
     dynamic_rect.topleft = (player_pos.x - 16, player_pos.y - 16)
     if dynamic_rect.colliderect(box_rect):
         pygame.draw.rect(screen, red, box_rect)
+    if dynamic_rect.colliderect(box_rect):
+        X_VELOCITY = 0
+        Y_VELOCITY = 0
+        if current_direction == direction.RIGHT:
+            player_pos.x -= 1.5
+        elif current_direction == direction.LEFT:
+            player_pos.x += 1.5
+        elif current_direction == direction.UP:
+            player_pos.y += 1.5
+        elif current_direction == direction.DOWN:
+            player_pos.y -= 1
+            jumping = False
 
     # Update the display
     pygame.display.flip()
