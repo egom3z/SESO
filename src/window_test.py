@@ -73,6 +73,7 @@ Y_GRAVITY = 1
 JUMP_HEIGHT = 15
 Y_VELOCITY = JUMP_HEIGHT
 jumping = False
+falling = False
 walking = False
 MAX_VELOCITY = 10
 MIN_VELOCITY = -10
@@ -144,17 +145,17 @@ while running:
 
     # Post-input functions
     if keys[pygame.K_SPACE]:
-            jumping = True
+        jumping = True
             # if Y_VELOCITY > 0:
             #     current_direction = direction.UP
             # elif Y_VELOCITY < 0:
             #     current_direction = direction.DOWN
-    elif keys[pygame.K_a]:
+    elif keys[pygame.K_a]: # moving left
         walking = keys[pygame.K_a]
         forward_facing = False
         current_direction = direction.LEFT
         X_VELOCITY -= 1
-    elif keys[pygame.K_d]:
+    elif keys[pygame.K_d]: # moving right
         forward_facing = True
         walking = keys[pygame.K_d]
         current_direction = direction.RIGHT
@@ -162,14 +163,11 @@ while running:
     elif not keys[pygame.K_d] and not keys[pygame.K_a]:
          current_direction = direction.STOP
          X_VELOCITY = 0
-
-    
     
     # Walking mechanics
     if walking:
         player_pos.x += X_VELOCITY
         
-
     # Jumping mechanics
     if jumping:
         player_pos.y -= Y_VELOCITY
@@ -178,7 +176,10 @@ while running:
              current_direction = direction.UP
         if Y_VELOCITY < -JUMP_HEIGHT:
             jumping = False
-            Y_VELOCITY = JUMP_HEIGHT     
+            Y_VELOCITY = JUMP_HEIGHT 
+            
+    falling = (Y_VELOCITY < 0)
+    if falling: current_direction = direction.DOWN
 
     # Display character sprite
     if current_direction == direction.LEFT:
@@ -206,14 +207,13 @@ while running:
     if dynamic_rect.colliderect(box_rect):
         pygame.draw.rect(screen, red, box_rect)
     if dynamic_rect.colliderect(box_rect):
-        X_VELOCITY = 0
-        Y_VELOCITY = 0
         if current_direction == direction.RIGHT:
-            player_pos.x -= 1.5
+            player_pos.x -= 1
+            X_VELOCITY = 0
         elif current_direction == direction.LEFT:
-            player_pos.x += 1.5
+            player_pos.x += 1
         elif current_direction == direction.UP:
-            player_pos.y += 1.5
+            player_pos.y += 1
         elif current_direction == direction.DOWN:
             player_pos.y -= 1
             jumping = False
