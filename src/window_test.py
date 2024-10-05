@@ -15,6 +15,8 @@ class direction(Enum):
     UP = 3
     JUMP = 4
 
+forward_facing = True # last direction faced
+
 direction = Enum('direction', ['STOP', 'LEFT', 'RIGHT','UP','JUMP'])
 current_direction = direction.STOP
 
@@ -38,7 +40,7 @@ seconds_elapsed = 0
 last_time = pygame.time.get_ticks()
 
 # Box object definition
-box_rect = pygame.Rect(center_x+150, center_y-84, 100, 100)
+box_rect = pygame.Rect(center_x + 150, center_y - 84, 100, 100)
 box_border = 5
 
 
@@ -46,17 +48,23 @@ box_border = 5
 # Set up the sprite sheets
 sprite_sheet = pygame.image.load('src/images/character_sheet2.png').convert_alpha()
 sprite0_rect = pygame.Rect(16,96,16,16) # Character standing facing right
+sprite1_rect = pygame.Rect(64,96,16,16)  # Character standing facing left
 spriteR_rect = pygame.Rect(32,96,16,16) # Character walking to the right
 spriteL_rect = pygame.Rect(0,96,16,16)  # Character walking to the left
 spriteJ_rect = pygame.Rect(16,80,16,16) # Character jumping up facing right
+spriteJL_rect = pygame.Rect(0,80,16,16) # Character jumping up facing left
 sprite0 = sprite_sheet.subsurface(sprite0_rect)
+sprite1 = sprite_sheet.subsurface(sprite1_rect)
 spriteR = sprite_sheet.subsurface(spriteR_rect)
 spriteL = sprite_sheet.subsurface(spriteL_rect)
 spriteJ = sprite_sheet.subsurface(spriteJ_rect)
+spriteJL = sprite_sheet.subsurface(spriteJL_rect)
 scaled_sprite0 = pygame.transform.scale(sprite0, (32,32)) # Scales up 16x16 sprite
+scaled_sprite1 = pygame.transform.scale(sprite1, (32,32))
 scaled_spriteR = pygame.transform.scale(spriteR, (32,32))
 scaled_spriteL = pygame.transform.scale(spriteL, (32,32))
 scaled_spriteJ = pygame.transform.scale(spriteJ, (32,32))
+scaled_spriteJL = pygame.transform.scale(spriteJL, (32,32))
 
 
 
@@ -139,9 +147,11 @@ while running:
             jumping = True
     elif keys[pygame.K_a]:
         walking = keys[pygame.K_a]
+        forward_facing = False
         current_direction = direction.LEFT
         X_VELOCITY -= 1
     elif keys[pygame.K_d]:
+        forward_facing = True
         walking = keys[pygame.K_d]
         current_direction = direction.RIGHT
         X_VELOCITY += 1
@@ -172,9 +182,15 @@ while running:
     elif current_direction == direction.RIGHT:
          screen.blit(scaled_spriteR, (player_pos.x - 16, player_pos.y - 16))
     elif current_direction == direction.JUMP:
-         screen.blit(scaled_spriteJ, (player_pos.x-16, player_pos.y -16))
+        if forward_facing:
+            screen.blit(scaled_spriteJ, (player_pos.x - 16, player_pos.y - 16))
+        elif not forward_facing:
+            screen.blit(scaled_spriteJL, (player_pos.x - 16, player_pos.y - 16))
     else:
-         screen.blit(scaled_sprite0, (player_pos.x - 16, player_pos.y - 16))
+        if forward_facing:
+            screen.blit(scaled_sprite0, (player_pos.x - 16, player_pos.y - 16))
+        elif not forward_facing:
+            screen.blit(scaled_sprite1, (player_pos.x - 16, player_pos.y - 16))
 
     # Collision management
     dynamic_rect.topleft = (player_pos.x - 16, player_pos.y - 16)
