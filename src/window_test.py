@@ -19,7 +19,7 @@ forward_facing = True # last direction faced
 
 direction = Enum('direction', ['STOP', 'LEFT', 'RIGHT','UP','DOWN'])
 current_direction = direction.STOP
-
+    
 
 # Defining colors for conveniance
 white = (255,255,255)
@@ -106,7 +106,6 @@ while running:
     # Old player dot
     # pygame.draw.circle(screen, black, player_pos, 5)
 
-
         # Boundry Check
     if player_pos.x - 5 < 0:
          player_pos.x = 5
@@ -177,7 +176,7 @@ while running:
         if Y_VELOCITY < -JUMP_HEIGHT:
             jumping = False
             Y_VELOCITY = JUMP_HEIGHT 
-            
+
     falling = (Y_VELOCITY < 0)
     if falling: current_direction = direction.DOWN
 
@@ -202,21 +201,30 @@ while running:
         elif not forward_facing:
             screen.blit(scaled_sprite1, (player_pos.x - 16, player_pos.y - 16))
 
-    # Collision management
+    # Collision detection and response
     dynamic_rect.topleft = (player_pos.x - 16, player_pos.y - 16)
-    if dynamic_rect.colliderect(box_rect):
-        pygame.draw.rect(screen, red, box_rect)
-    if dynamic_rect.colliderect(box_rect):
+    collision_occured = dynamic_rect.colliderect(box_rect)
+
+    if collision_occured:
         if current_direction == direction.RIGHT:
-            player_pos.x -= 1
+            # Prevent moving further into the box
+            player_pos.x = box_rect.left - dynamic_rect.width / 2
             X_VELOCITY = 0
-        elif current_direction == direction.LEFT:
-            player_pos.x += 1
-        elif current_direction == direction.UP:
-            player_pos.y += 1
-        elif current_direction == direction.DOWN:
-            player_pos.y -= 1
+        if current_direction == direction.LEFT:
+            player_pos.x = box_rect.right + dynamic_rect.width / 2
+            X_VELOCITY = 0
+        if current_direction == direction.UP:
+            player_pos.y = box_rect.bottom + dynamic_rect.height / 2
+            Y_VELOCITY = 0
+            jumping = True
+        if current_direction == direction.DOWN:
+            player_pos.y = box_rect.top - dynamic_rect.height / 2
+            Y_VELOCITY = 0
             jumping = False
+
+    
+    if collision_occured: print("Collision!")
+    else: print("No Collision!")
 
     # Update the display
     pygame.display.flip()
@@ -224,7 +232,6 @@ while running:
     
     clock.tick(60)  # limits FPS to 60
     
-
 # Quit Pygame
 pygame.quit()
 sys.exit()
