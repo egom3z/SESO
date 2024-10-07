@@ -46,7 +46,7 @@ box_border = 5
 
 
 # Set up the sprite sheets
-sprite_sheet = pygame.image.load('images/character_sheet2.png').convert_alpha()
+sprite_sheet = pygame.image.load('src/images/character_sheet2.png').convert_alpha()
 sprite0_rect = pygame.Rect(16,96,16,16) # Character standing facing right
 sprite1_rect = pygame.Rect(64,96,16,16)  # Character standing facing left
 spriteR_rect = pygame.Rect(32,96,16,16) # Character walking to the right
