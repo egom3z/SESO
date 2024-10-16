@@ -38,6 +38,7 @@ box_border = 5
 ground_level = center_y
 
 # Set up the sprite sheets
+<<<<<<< HEAD
 sprite_sheet = pygame.image.load('images/character_sheet2.png').convert_alpha()
 sprite0_rect = pygame.Rect(16, 96, 16, 16)  # Character standing facing right
 sprite1_rect = pygame.Rect(64, 96, 16, 16)  # Character standing facing left
@@ -45,6 +46,15 @@ spriteR_rect = pygame.Rect(32, 96, 16, 16)  # Character walking to the right
 spriteL_rect = pygame.Rect(0, 96, 16, 16)  # Character walking to the left
 spriteJ_rect = pygame.Rect(16, 80, 16, 16)  # Character jumping up facing right
 spriteJL_rect = pygame.Rect(0, 80, 16, 16)  # Character jumping up facing left
+=======
+sprite_sheet = pygame.image.load('src/images/character_sheet2.png').convert_alpha()
+sprite0_rect = pygame.Rect(16,96,16,16) # Character standing facing right
+sprite1_rect = pygame.Rect(64,96,16,16)  # Character standing facing left
+spriteR_rect = pygame.Rect(32,96,16,16) # Character walking to the right
+spriteL_rect = pygame.Rect(0,96,16,16)  # Character walking to the left
+spriteJ_rect = pygame.Rect(16,80,16,16) # Character jumping up facing right
+spriteJL_rect = pygame.Rect(0,80,16,16) # Character jumping up facing left
+>>>>>>> c6281ca742ffea3831a5846aed2e8f2fa25279a2
 sprite0 = sprite_sheet.subsurface(sprite0_rect)
 sprite1 = sprite_sheet.subsurface(sprite1_rect)
 spriteR = sprite_sheet.subsurface(spriteR_rect)
